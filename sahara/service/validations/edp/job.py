@@ -72,20 +72,23 @@ def _check_binaries(values):
 def check_mains_libs(data, **kwargs):
     mains = data.get("mains", [])
     libs = data.get("libs", [])
+    topology_name = data.get("topology_name", [])
     job_type, subtype = edp.split_job_type(data.get("type"))
     streaming = (job_type == edp.JOB_TYPE_MAPREDUCE and
                  subtype == edp.JOB_SUBTYPE_STREAMING)
 
     # These types must have a value in mains and may also use libs
     if job_type in [edp.JOB_TYPE_PIG, edp.JOB_TYPE_HIVE,
-                    edp.JOB_TYPE_SHELL, edp.JOB_TYPE_SPARK]:
+                    edp.JOB_TYPE_SHELL, edp.JOB_TYPE_SPARK,
+                    edp.JOB_TYPE_STORM]:
         if not mains:
-            if job_type == edp.JOB_TYPE_SPARK:
+            if job_type in [edp.JOB_TYPE_SPARK, edp.JOB_TYPE_STORM]:
                 msg = _(
                     "%s job requires main application jar") % data.get("type")
             else:
                 msg = _("%s flow requires main script") % data.get("type")
             raise e.InvalidDataException(msg)
+
         # Check for overlap
         if set(mains).intersection(set(libs)):
             raise e.InvalidDataException(_("'mains' and 'libs' overlap"))
