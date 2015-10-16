@@ -19,6 +19,7 @@ from sahara import conductor as cond
 from sahara import context
 from sahara.plugins import base as pb
 from sahara.plugins import exceptions as ex
+from sahara.plugins.storm import plugin
 from sahara.tests.unit import base
 
 
@@ -62,12 +63,12 @@ class StormPluginTest(base.SaharaWithDbTestCase):
                     ]
                 }
         cluster = conductor.cluster_create(context.ctx(), data)
-        plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
+        storm_plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
         supervisor_id = [node.id for node in cluster.node_groups
                          if node.name == 'supervisor']
         self.assertEqual(None,
-                         plugin._validate_existing_ng_scaling(cluster,
-                                                              supervisor_id))
+                         storm_plugin._validate_existing_ng_scaling(cluster,
+                             supervisor_id))
 
     def test_validate_additional_ng_scaling(self):
         data = {'name': "cluster",
@@ -86,19 +87,18 @@ class StormPluginTest(base.SaharaWithDbTestCase):
                      'flavor_id': '42',
                      'count': 1,
                      'node_processes': ['zookeeper']},
-                    {'name': 'slave2',
-                     'flavor_id': '42',
+                    {'name': 'slave2', 'flavor_id': '42',
                      'count': 0,
                      'node_processes': ['supervisor']}
                     ]
                 }
         cluster = conductor.cluster_create(context.ctx(), data)
-        plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
+        storm_plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
         supervisor_id = [node.id for node in cluster.node_groups
                          if node.name == 'supervisor']
         self.assertEqual(None,
-                         plugin._validate_additional_ng_scaling(cluster,
-                                                                supervisor_id))
+                         storm_plugin._validate_additional_ng_scaling(cluster,
+                             supervisor_id))
 
     def test_validate_existing_ng_scaling_raises(self):
         data = {'name': "cluster",
@@ -120,11 +120,11 @@ class StormPluginTest(base.SaharaWithDbTestCase):
                     ]
                 }
         cluster = conductor.cluster_create(context.ctx(), data)
-        plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
+        storm_plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
         master_id = [node.id for node in cluster.node_groups
                      if node.name == 'master']
         self.assertRaises(ex.NodeGroupCannotBeScaled,
-                          plugin._validate_existing_ng_scaling,
+                          storm_plugin._validate_existing_ng_scaling,
                           cluster, master_id)
 
     def test_validate_additional_ng_scaling_raises(self):
@@ -151,9 +151,21 @@ class StormPluginTest(base.SaharaWithDbTestCase):
                     ]
                 }
         cluster = conductor.cluster_create(context.ctx(), data)
-        plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
+        storm_plugin = pb.PLUGINS.get_plugin(cluster.plugin_name)
         master_id = [node.id for node in cluster.node_groups
                      if node.name == 'master2']
         self.assertRaises(ex.NodeGroupCannotBeScaled,
-                          plugin._validate_existing_ng_scaling,
+                          storm_plugin._validate_existing_ng_scaling,
                           cluster, master_id)
+
+    def test_get_open_port(self):
+        plugin_storm = plugin.StormProvider()
+        cluster = mock.Mock()
+        ng = mock.Mock()
+        ng.node_processes = ['nimbus']
+        cluster.node_groups = [ng]
+        ng.cluster = cluster
+        ports = plugin_storm.get_open_ports(ng)
+        self.assertEqual([8080], ports)
+
+
