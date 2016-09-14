@@ -13,9 +13,11 @@ if [ ! -f /etc/init.d/mysql* ]; then
         sudo sed -i "s/^\(bind-address\s*=\s*\).*\$/\10.0.0.0/" \
                                                         /etc/mysql/my.cnf
         sudo service mysql restart
-    elif [[ $1 == *"CentOS"* ]] || \
-        [[ $1 == *"Red Hat Enterprise Linux"* ]]; then
+    elif [[ $1 == *"CentOS"* ]]; then
         sudo yum install -y mysql-server
+        sudo yum install -y mysql-connector-java
+    elif [[ $1 == *"RedHatEnterpriseServer"* ]]; then
+        sudo yum install -y mariadb-server
         sudo yum install -y mysql-connector-java
     elif [[ $1 == *"SUSE"* ]]; then
         sudo zypper mysql-server
