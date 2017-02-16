@@ -1,0 +1,84 @@
+arguments:
+  java_distro:
+    default: cloudera-jdk
+    description: The distribution of Java to install. Defaults to openjdk.
+    choices:
+      - openjdk
+      - oracle-java
+      - cloudera-jdk
+  plugin_version:
+    default: 5.7.0
+    description: The distribution of CDH to install. Defaults to 5.7.0.
+    hidden: True
+    required: False
+    choices:
+      - 5.7.0
+      - 5.7.1
+      - 5.7.2
+      - 5.7.3
+      - 5.7.4
+      - 5.7.5
+validators:
+  - package: wget
+  - os_case:
+      - centos:
+          - script: centos/wget_repo
+  - argument_case:
+          argument_name: java_distro
+          cases:
+            openjdk:
+              - any:
+                - all:
+                  - package: java-1.8.0-openjdk-devel
+                - all:
+                  - package: java-1.7.0-openjdk-devel
+            cloudera-jdk:
+              - all:
+                - package: oracle-j2sdk1.7
+  - os_case:
+    - centos:
+      - package:
+#        - cloudera-manager-agent
+#        - cloudera-manager-daemons
+#        - cloudera-manager-server
+#        - cloudera-manager-server-db-2
+        - hadoop-hdfs-secondarynamenode
+        - hadoop-mapreduce
+        - hadoop-mapreduce-historyserver
+        - hadoop-yarn-nodemanager
+        - hadoop-yarn-resourcemanager
+        - hbase
+        - hive-hcatalog
+        - hive-metastore
+        - hive-server2
+        - hive-webhcat-server
+        - hue
+        - oozie
+        - spark-core
+        - zookeeper
+        - flume-ng
+        - hadoop-kms
+        - hbase-solr
+        - impala
+        - impala-server
+        - impala-state-store
+        - impala-catalog
+        - impala-shell
+        - keytrustee-keyprovider
+        - sentry
+        - solr-server
+        - solr-doc
+        - search
+        - spark-history-server
+        - sqoop2
+        - kafka
+        - kafka-server
+      - script:
+          centos/install_cloudera:
+            env_vars: [plugin_version]
+      - script: centos/turn_off_services
+
+
+
+# cloudera_elements_sequence="hadoop-cloudera swift_hadoop kdc"
+# centos7_cloudera_elements_sequence="selinux-permissive disable-firewall nc"

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+for i in cloudera-scm-agent \
+cloudera-scm-server \
+cloudera-scm-server-db \
+hadoop-hdfs-datanode \
+hadoop-hdfs-namenode \
+hadoop-hdfs-secondarynamenode \
+hadoop-mapreduce-historyserver \
+hadoop-yarn-nodemanager \
+hadoop-yarn-resourcemanager \
+hive-metastore \
+hive-server2 \
+hive-webhcat-server \
+hue \
+oozie \
+postgresql \
+impala-catalog \
+impala-server \
+impala-state-store \
+solr-server \
+spark-history-server
+do
+    chkconfig $i off
+done

@@ -19,6 +19,7 @@ from sahara.plugins.cdh.v5_7_0 import cloudera_utils
 from sahara.plugins.cdh.v5_7_0 import config_helper
 from sahara.plugins.cdh.v5_7_0 import deploy
 from sahara.plugins.cdh.v5_7_0 import edp_engine
+from sahara.plugins.cdh.v5_7_0 import images
 from sahara.plugins.cdh.v5_7_0 import plugin_utils
 from sahara.plugins.cdh.v5_7_0 import validation
 from sahara.plugins import kerberos
@@ -33,6 +34,7 @@ class VersionHandler(avm.BaseVersionHandler):
         self.plugin_utils = plugin_utils.PluginUtilsV570()
         self.deploy = deploy
         self.edp_engine = edp_engine
+        self.images = images
         self.validation = validation.ValidatorV570()
 
     def get_plugin_configs(self):
